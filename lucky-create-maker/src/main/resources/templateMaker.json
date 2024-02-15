@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "name": "acm-template-pro-generator",
+    "description": "ACM 代码模版生成器"
+  },
+  "originProjectPath": "../../../lucky-create-generator-demo/springboot-init",
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/java/com/luckyone/springbootinit/common"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "className",
+        "type": "String",
+        "defaultValue": true,
+        "replaceText": "BaseResponse"
+      }
+    ]
+  }
+}

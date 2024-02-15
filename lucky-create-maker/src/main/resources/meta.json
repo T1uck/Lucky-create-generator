@@ -1,0 +1,84 @@
+{
+    "name": "acm-template-pro-generator",
+    "description": "ACM 实例代码生成器",
+    "basePackage": "com.luckyone",
+    "version": "1.0",
+    "author": "luckyone",
+    "createTime": "2023-11-24",
+    "fileConfig": {
+        "inputRootPath": ".source/acm-template-pro",
+        "outputRootPath": "generated",
+        "sourceRootPath": "E:/study/lucky-create-generator/lucky-create-generator-demo/acm-template-pro",
+        "type": "dir",
+        "files": [
+        	{
+        		"inputPath": "src/com/luckyone/acm/MainTemplate.java.ftl",
+				"outputPath": "src/com/luckyone/acm/MainTemplate.java",
+				"type": "file",
+        		"generateType": "dynamic"
+    		},
+            {
+              "groupKey": "git",
+              "groupName": "开源文件",
+              "type": "group",
+              "condition": "needGit",
+              "files": [
+                {
+                  "inputPath": ".gitignore",
+                  "outputPath": ".gitignore",
+                  "type": "file",
+                  "generateType": "static",
+                  "condition": "needGit"
+                },
+                {
+                  "inputPath": "README.md",
+                  "outputPath": "README.md",
+                  "type": "file",
+                  "generateType": "static"
+                }
+              ]
+            }
+        ]
+    },
+    "modelConfig": {
+		"models": [
+            {
+              "fieldName": "needGit",
+              "type": "boolean",
+              "description": "是否生成.gitignore 文件",
+              "defaultValue": true
+            },
+            {
+              "fieldName": "loop",
+              "type": "boolean",
+              "description": "是否生成循环",
+              "defaultValue": false,
+              "abbr": "l"
+            },
+            {
+              "groupKey": "mainTemplate",
+              "groupName": "核心模版",
+              "type": "MainTemplate",
+              "description": "用于生成核心模版文件",
+              "condition": "loop",
+              "models": [
+                {
+                  "fieldName": "author",
+                  "type": "String",
+                  "description": "作者注释",
+                  "defaultValue": "lucky",
+                  "abbr": "a"
+                },
+                {
+                  "fieldName": "outputText",
+                  "type": "String",
+                  "description": "输出信息",
+                  "defaultValue": "sum = ",
+                  "abbr": "o"
+                }
+              ]
+            }
+
+        ]    
+	}
+}
