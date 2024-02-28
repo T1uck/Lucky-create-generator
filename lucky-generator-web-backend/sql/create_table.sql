@@ -10,7 +10,11 @@ create table if not exists user
 (
     id           bigint auto_increment comment 'id' primary key,
     userAccount  varchar(256)                           not null comment '账号',
-    userPassword varchar(512)                           not null comment '密码',
+    userPassword varchar(512)                             null comment '密码',
+    email          varchar(256)                           null comment '邮箱',
+    phone          varchar(32)                            null comment '手机号',
+    accessKey      varchar(256)                           null comment 'accessKey',
+    secretKey      varchar(256)                           null comment 'secretKey',
     userName     varchar(256)                           null comment '用户昵称',
     userAvatar   varchar(1024)                          null comment '用户头像',
     userProfile  varchar(512)                           null comment '用户简介',

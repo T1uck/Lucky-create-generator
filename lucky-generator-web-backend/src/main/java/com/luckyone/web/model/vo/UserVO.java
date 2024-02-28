@@ -2,6 +2,9 @@ package com.luckyone.web.model.vo;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -13,6 +16,7 @@ public class UserVO implements Serializable {
     /**
      * id
      */
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
@@ -29,6 +33,26 @@ public class UserVO implements Serializable {
      * 用户简介
      */
     private String userProfile;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 手机号码
+     */
+    private String phone;
+
+    /**
+     * 访问密钥
+     */
+    private String accessKey;
+
+    /**
+     * 秘密密钥
+     */
+    private String secretKey;
 
     /**
      * 用户角色：user/admin/ban

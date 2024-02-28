@@ -1,14 +1,19 @@
 package com.luckyone.web.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.luckyone.web.annotation.AuthCheck;
-import com.luckyone.web.common.BaseResponse;
-import com.luckyone.web.common.DeleteRequest;
-import com.luckyone.web.common.ErrorCode;
-import com.luckyone.web.common.ResultUtils;
+import com.luckyone.web.common.*;
+import com.luckyone.web.config.EmailConfig;
+import com.luckyone.web.constant.EmailConstant;
 import com.luckyone.web.constant.UserConstant;
 import com.luckyone.web.exception.BusinessException;
 import com.luckyone.web.exception.ThrowUtils;
+import com.luckyone.web.model.dto.email.UserBindEmailRequest;
+import com.luckyone.web.model.dto.email.UserEmailLoginRequest;
+import com.luckyone.web.model.dto.email.UserEmailRegisterRequest;
+import com.luckyone.web.model.dto.email.UserUnBindEmailRequest;
+import com.luckyone.web.model.dto.phone.UserBindPhoneRequest;
 import com.luckyone.web.model.dto.user.*;
 import com.luckyone.web.model.entity.User;
 import com.luckyone.web.model.vo.LoginUserVO;
@@ -17,11 +22,21 @@ import com.luckyone.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import static com.luckyone.web.constant.EmailConstant.*;
+import static com.luckyone.web.utils.EmailUtil.buildEmailContent;
 
 /**
  * 用户接口
@@ -32,7 +47,144 @@ import java.util.List;
 public class UserController {
 
     @Resource
+    private EmailConfig emailConfig;
+
+    @Resource
     private UserService userService;
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Resource
+    private JavaMailSender mailSender;
+
+    @PostMapping("/update/password")
+    public BaseResponse<Boolean> updatePassword(@RequestBody UserUpdatePwdRequest userUpdatePwdRequest,HttpServletRequest request) {
+        if (userUpdatePwdRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        userService.updatePassword(userUpdatePwdRequest, request);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 用户绑定电话号码
+     *
+     * @param request              请求
+     * @param userBindPhoneRequest 用户绑定电话号码请求
+     * @return {@link BaseResponse}<{@link UserVO}>
+     */
+    @PostMapping("/bindPhone")
+    public BaseResponse<UserVO> userBindPhone(@RequestBody UserBindPhoneRequest userBindPhoneRequest, HttpServletRequest request) {
+        if (userBindPhoneRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserVO user = userService.userBindPhone(userBindPhoneRequest, request);
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 用户电子邮件登录
+     *
+     * @param userEmailLoginRequest 用户登录请求
+     * @param request               请求
+     * @return {@link BaseResponse}<{@link User}>
+     */
+    @PostMapping("/email/login")
+    public BaseResponse<UserVO> userEmailLogin(@RequestBody UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request) {
+        if (userEmailLoginRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserVO user = userService.userEmailLogin(userEmailLoginRequest, request);
+        redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailLoginRequest.getEmailAccount());
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 用户绑定电子邮件
+     *
+     * @param request              请求
+     * @param userBindEmailRequest 用户绑定电子邮件请求
+     * @return {@link BaseResponse}<{@link UserVO}>
+     */
+    @PostMapping("/bind/login")
+    public BaseResponse<UserVO> userBindEmail(@RequestBody UserBindEmailRequest userBindEmailRequest, HttpServletRequest request) {
+        if (userBindEmailRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserVO user = userService.userBindEmail(userBindEmailRequest, request);
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 用户取消绑定电子邮件
+     *
+     * @param request                请求
+     * @param userUnBindEmailRequest 用户取消绑定电子邮件请求
+     * @return {@link BaseResponse}<{@link UserVO}>
+     */
+    @PostMapping("/unbindEmail")
+    public BaseResponse<UserVO> userUnBindEmail(@RequestBody UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
+        if (userUnBindEmailRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        UserVO user = userService.userUnBindEmail(userUnBindEmailRequest, request);
+        redisTemplate.delete(CAPTCHA_CACHE_KEY + userUnBindEmailRequest.getEmailAccount());
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 用户电子邮件注册
+     *
+     * @param userEmailRegisterRequest 用户电子邮件注册请求
+     * @return {@link BaseResponse}<{@link UserVO}>
+     */
+    @PostMapping("/email/register")
+    public BaseResponse<Long> userEmailRegister(@RequestBody UserEmailRegisterRequest userEmailRegisterRequest) {
+        if (userEmailRegisterRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        long result = userService.userEmailRegister(userEmailRegisterRequest);
+        redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmailAccount());
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 获取验证码
+     *
+     * @param emailAccount 电子邮件帐户
+     * @return {@link BaseResponse}<{@link String}>
+     */
+    @GetMapping("/getCaptcha")
+    public BaseResponse<Boolean> getCaptcha(String emailAccount) {
+        if (StringUtils.isBlank(emailAccount)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (!Pattern.matches(emailPattern, emailAccount)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
+        }
+        String captcha = RandomUtil.randomNumbers(6);
+        try {
+            sendEmail(emailAccount, captcha);
+            redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + emailAccount, captcha, 5, TimeUnit.MINUTES);
+            return ResultUtils.success(true);
+        } catch (Exception e) {
+            log.error("【发送验证码失败】" + e.getMessage());
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码获取失败");
+        }
+    }
+
+    private void sendEmail(String emailAccount, String captcha) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        // 邮箱发送内容组成
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setSubject(EmailConstant.EMAIL_SUBJECT);
+        helper.setText(buildEmailContent(EmailConstant.EMAIL_HTML_CONTENT_PATH, captcha), true);
+        helper.setTo(emailAccount);
+        helper.setFrom(EmailConstant.EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
+        mailSender.send(message);
+    }
 
     // region 登录相关
 
@@ -50,10 +202,11 @@ public class UserController {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+        String userName = userRegisterRequest.getUserName();
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword,userName)) {
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        long result = userService.userRegister(userAccount, userPassword, checkPassword,userName);
         return ResultUtils.success(result);
     }
 
@@ -262,6 +415,24 @@ public class UserController {
         BeanUtils.copyProperties(userUpdateMyRequest, user);
         user.setId(loginUser.getId());
         boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 更新用户 secretKey
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/secret_key")
+    public BaseResponse<Boolean> updateSecretKey(@RequestBody IdRequest idRequest,
+                                                 HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean result = userService.updateSecretKey(idRequest.getId());
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
