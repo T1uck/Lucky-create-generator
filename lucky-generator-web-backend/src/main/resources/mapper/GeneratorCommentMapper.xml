@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyone.web.mapper.GeneratorCommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.luckyone.web.model.entity.GeneratorComment">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="generatorId" column="generatorId" jdbcType="BIGINT"/>
+            <result property="rootId" column="rootId" jdbcType="BIGINT"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="fromId" column="fromId" jdbcType="BIGINT"/>
+            <result property="toId" column="toId" jdbcType="BIGINT"/>
+            <result property="toCommentId" column="toCommentId" jdbcType="BIGINT"/>
+            <result property="likeComment" column="likeComment" jdbcType="INTEGER"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,generatorId,rootId,
+        content,fromId,toId,
+        toCommentId,likeComment,createTime,
+        isDelete
+    </sql>
+</mapper>

@@ -17,6 +17,12 @@
             <result property="modelConfig" column="modelConfig" jdbcType="VARCHAR"/>
             <result property="distPath" column="distPath" jdbcType="VARCHAR"/>
             <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="viewCount" column="viewCount" jdbcType="BIGINT"/>
+            <result property="likeCount" column="likeCount" jdbcType="BIGINT"/>
+            <result property="starCount" column="starCount" jdbcType="BIGINT"/>
+            <result property="commentCount" column="commentCount" jdbcType="BIGINT"/>
+            <result property="score" column="score" jdbcType="INTEGER"/>
+            <result property="hot" column="hot" jdbcType="INTEGER"/>
             <result property="userId" column="userId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
@@ -28,6 +34,7 @@
         basePackage,version,author,
         tags,picture,fileConfig,
         modelConfig,distPath,status,
+        viewCount,likeCount,starCount,commentCount,score,hot,
         userId,createTime,updateTime,
         isDelete
     </sql>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyone.web.mapper.GeneratorLikeMapper">
+
+    <resultMap id="BaseResultMap" type="com.luckyone.web.model.entity.GeneratorLike">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="generatorId" column="generatorId" jdbcType="BIGINT"/>
+            <result property="createBy" column="createBy" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,generatorId,createBy,
+        createTime
+    </sql>
+</mapper>

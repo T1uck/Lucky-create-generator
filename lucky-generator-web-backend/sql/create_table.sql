@@ -41,11 +41,63 @@ create table if not exists generator
     distPath    text                               null comment '代码生成器产物路径',
     status      int      default 0                 not null comment '状态',
     userId      bigint                             not null comment '创建用户 id',
+    view        bigint   default 0                 comment '访问量',
+    like        bigint   default 0                 comment '点赞数',
+    star        bigint   default 0                 comment '收藏数',
+    comment     bigint   default 0                 comment '评论数',
+    score       int      default 0                 comment '项目的总分数，是根据浏览、点赞、收藏、评论数计算得来的',
+    hot         int      default 0                 comment '项目的热度，有一个定时任务，每小时计算增加的score',
     createTime  datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete    tinyint  default 0                 not null comment '是否删除',
     index idx_userId (userId)
     ) comment '代码生成器' collate = utf8mb4_unicode_ci;
+
+-- 生成器评论表
+create table if not exists generator_comment
+(
+    id              bigint          auto_increment          not null comment '评论id' primary key,
+    generatorId     bigint                                  not null comment '生成器id',
+    rootId          bigint          default 0               not null comment '根评论id，-1代表是根评论',
+    content         varchar(4096)   default                 null comment '评论内容',
+    fromId          bigint                                  not null comment '评论者id',
+    toId            bigint          default                 null comment '被评论者id',
+    toCommentId     bigint          default                 null comment '这条评论是回复那条评论的，只有子评论才有（子评论的子评论，树形）',
+    likeComment     int             default 0               comment '评论点赞数',
+    createTime      datetime        default CURRENT_TIMESTAMP not null comment '创建时间',
+    isDelete        tinyint         default 0               not null comment '是否删除'
+) comment '生成器评论表' collate = utf8mb4_unicode_ci;
+
+-- 生成器点赞表
+create table if not exists generator_like
+(
+    id              bigint          auto_increment          not null comment 'id' primary key,
+    generatorId     bigint                                  not null comment '生成器id',
+    createBy        bigint                                  not null comment '创建用户id',
+    createTime      datetime        default CURRENT_TIMESTAMP not null comment '创建时间'
+) comment '生成器点赞表' collate = utf8mb4_unicode_ci;
+
+-- 生成器收藏表
+create table if not exists generator_star
+(
+    id              bigint          auto_increment          not null comment 'id' primary key,
+    generatorId     bigint                                  not null comment '生成器id',
+    createBy        bigint                                  not null comment '创建用户id',
+    bookId          bigint                                  not null comment '收藏夹id',
+    createTime      datetime        default CURRENT_TIMESTAMP not null comment '创建时间'
+) comment '生成器收藏表' collate = utf8mb4_unicode_ci;
+
+-- 用户收藏名册
+create table if not exists star_book
+(
+    id              bigint          auto_increment          not null comment 'id' primary key,
+    name            varchar(128)                            not null comment '收藏夹名称',
+    createBy        bigint                                  not null comment '创建用户id',
+    count           int             default 0               comment '收藏夹内文件数',
+    createTime      datetime        default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime      datetime        default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete        tinyint         default 0               not null comment '是否删除'
+) comment '用户收藏夹' collate = utf8mb4_unicode_ci;
 
 -- 模拟用户数据
 INSERT INTO generator_db.user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (1, 'luckyone', 'b0dd3697a192885d7c055db46155b26a', '管理员', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
