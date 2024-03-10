@@ -9,11 +9,13 @@ import com.luckyone.web.model.dto.email.UserUnBindEmailRequest;
 import com.luckyone.web.model.dto.phone.UserBindPhoneRequest;
 import com.luckyone.web.model.dto.user.UserQueryRequest;
 import com.luckyone.web.model.dto.user.UserUpdatePwdRequest;
+import com.luckyone.web.model.dto.user.UsernameAndAvtarDto;
 import com.luckyone.web.model.entity.User;
 import com.luckyone.web.model.vo.LoginUserVO;
 import com.luckyone.web.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -170,4 +172,18 @@ public interface UserService extends IService<User> {
      * @param request
      */
     void updatePassword(UserUpdatePwdRequest userUpdatePwdRequest, HttpServletRequest request);
+
+    /**
+     * 获取用户集合
+     * @param ids
+     * @return
+     */
+    List<UsernameAndAvtarDto> listUserNameAndAvatarByUids(Collection<Long> ids);
+
+    /**
+     * 获取用户头像和昵称
+     * @param id
+     * @return
+     */
+    UsernameAndAvtarDto getUsernameAndAvatar(Long id);
 }

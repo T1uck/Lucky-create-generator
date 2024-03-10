@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.luckyone.web.common.BeanCopyUtils;
 import com.luckyone.web.common.ErrorCode;
 import com.luckyone.web.constant.CommonConstant;
 import com.luckyone.web.constant.EmailConstant;
@@ -19,6 +20,7 @@ import com.luckyone.web.model.dto.email.UserUnBindEmailRequest;
 import com.luckyone.web.model.dto.phone.UserBindPhoneRequest;
 import com.luckyone.web.model.dto.user.UserQueryRequest;
 import com.luckyone.web.model.dto.user.UserUpdatePwdRequest;
+import com.luckyone.web.model.dto.user.UsernameAndAvtarDto;
 import com.luckyone.web.model.entity.User;
 import com.luckyone.web.model.enums.UserRoleEnum;
 import com.luckyone.web.model.vo.LoginUserVO;
@@ -36,6 +38,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -533,5 +536,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         } else {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"旧密码错误，请重新输入！");
         }
+    }
+
+    @Override
+    public List<UsernameAndAvtarDto> listUserNameAndAvatarByUids(Collection<Long> ids) {
+        if(ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return lambdaQuery()
+                .select(User::getId, User::getUserName, User::getUserAvatar)
+                .in(User::getId, ids).list().stream()
+                .map(user -> BeanCopyUtils.copyBean(user, UsernameAndAvtarDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UsernameAndAvtarDto getUsernameAndAvatar(Long id) {
+        User user = getById(id);
+        UsernameAndAvtarDto usernameAndAvtarDto = new UsernameAndAvtarDto();
+        BeanUtils.copyProperties(user, usernameAndAvtarDto);
+        return usernameAndAvtarDto;
     }
 }

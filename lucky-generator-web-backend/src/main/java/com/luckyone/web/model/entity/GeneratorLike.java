@@ -12,7 +12,7 @@ import lombok.Data;
  * 生成器点赞表
  * @TableName genrator_like
  */
-@TableName(value ="genrator_like")
+@TableName(value ="generator_like")
 @Data
 public class GeneratorLike implements Serializable {
     /**

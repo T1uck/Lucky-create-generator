@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -129,6 +126,17 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     }
 
     @Override
+    public List<GeneratorVO> getGeneratorVOS(List<Generator> generators,HttpServletRequest request){
+        int size = generators.size();
+        ArrayList<GeneratorVO> generatorVOS = new ArrayList<>();
+        for (Generator generator : generators) {
+            GeneratorVO generatorVO = getGeneratorVO(generator, request);
+            generatorVOS.add(generatorVO);
+        }
+        return generatorVOS;
+    }
+
+    @Override
     public Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request) {
         List<Generator> generatorList = generatorPage.getRecords();
         Page<GeneratorVO> generatorVOPage = new Page<>(generatorPage.getCurrent(), generatorPage.getSize(), generatorPage.getTotal());
@@ -152,6 +160,15 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }).collect(Collectors.toList());
         generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
+    }
+
+    @Override
+    public List<GeneratorVO> getGeneratorsByIds(List<Long> generatorIds, HttpServletRequest request) {
+        if (generatorIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Generator> generatorList = listByIds(generatorIds);
+        return getGeneratorVOS(generatorList, request);
     }
 
 }

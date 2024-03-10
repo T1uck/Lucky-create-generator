@@ -12,7 +12,7 @@ import lombok.Data;
  * 生成器收藏表
  * @TableName genrator_star
  */
-@TableName(value ="genrator_star")
+@TableName(value ="generator_star")
 @Data
 public class GeneratorStar implements Serializable {
     /**
