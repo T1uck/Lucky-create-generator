@@ -249,7 +249,7 @@ public class GeneratorController {
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
-        queryWrapper.select("id", "description", "tags", "picture", "status", "userId", "createTime", "updateTime");
+        queryWrapper.select("id", "description", "tags", "picture", "status", "userId","likeCount","starCount","commentCount","userId", "createTime", "updateTime");
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
 

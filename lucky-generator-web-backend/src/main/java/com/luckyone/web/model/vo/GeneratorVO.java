@@ -83,6 +83,36 @@ public class GeneratorVO implements Serializable {
     private Integer status;
 
     /**
+     * 访问量
+     */
+    private Long viewCount;
+
+    /**
+     * 点赞数
+     */
+    private Long likeCount;
+
+    /**
+     * 收藏数
+     */
+    private Long starCount;
+
+    /**
+     * 评论数
+     */
+    private Long commentCount;
+
+    /**
+     * 总分数
+     */
+    private Integer score;
+
+    /**
+     * 热力值
+     */
+    private Integer hot;
+
+    /**
      * 创建用户 id
      */
     private Long userId;
