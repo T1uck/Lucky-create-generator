@@ -18,6 +18,7 @@ import com.luckyone.web.common.DeleteRequest;
 import com.luckyone.web.common.ErrorCode;
 import com.luckyone.web.common.ResultUtils;
 import com.luckyone.web.config.CacheConfig;
+import com.luckyone.web.constant.RedisConstant;
 import com.luckyone.web.constant.UserConstant;
 import com.luckyone.web.exception.BusinessException;
 import com.luckyone.web.exception.ThrowUtils;
@@ -249,7 +250,7 @@ public class GeneratorController {
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
-        queryWrapper.select("id", "description", "tags", "picture", "status", "userId","likeCount","starCount","commentCount","userId", "createTime", "updateTime");
+        queryWrapper.select("id", "description", "tags", "picture", "status", "userId","likeCount","starCount","commentCount", "createTime", "updateTime");
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
 
@@ -282,6 +283,30 @@ public class GeneratorController {
         return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
     }
 
+    /**
+     * 获取热门文章
+     * @return
+     */
+    @GetMapping("/list/hot")
+    public BaseResponse<List<Generator>> getHot() {
+
+        // 优先从缓存中获取
+        Object cacheValue =cacheManager.get(RedisConstant.HOT_ARTICLES);
+        // 多级缓存
+        if (cacheValue != null) {
+            return ResultUtils.success((List<Generator>) cacheValue);
+        }
+
+        // 限制爬虫
+        List<Generator> generatorList = generatorService.lambdaQuery()
+                .select(Generator::getId, Generator::getDescription, Generator::getTags, Generator::getPicture, Generator::getStatus, Generator::getUserId
+                        , Generator::getLikeCount, Generator::getStarCount, Generator::getCommentCount, Generator::getCreateTime, Generator::getUpdateTime)
+                .orderBy(true, false, Generator::getHot).last("limit 5").list();
+
+        // 写入多级缓存
+        cacheManager.put(RedisConstant.HOT_ARTICLES, generatorList);
+        return ResultUtils.success(generatorList);
+    }
 
     /**
      * 编辑（用户）
@@ -385,6 +410,7 @@ public class GeneratorController {
             }
         }
     }
+
 
     /**
      * 使用代码生成器

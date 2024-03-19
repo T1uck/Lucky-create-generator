@@ -71,6 +71,8 @@ public interface RedisConstant {
 
     public static final String ARTICLE_PUBLISHED = "generator:published";
 
+    public static final String ASYNC_CLEAR_LOCK = "generator:lock:clear";
+
 
     /**
      * 同步浏览量的锁
