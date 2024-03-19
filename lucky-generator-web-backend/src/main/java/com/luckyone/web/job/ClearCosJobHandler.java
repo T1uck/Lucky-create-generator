@@ -98,8 +98,8 @@ public class ClearCosJobHandler {
                 }
                 generatorService.updateBatchById(generators);
 
-                // 将hot前10的文章缓存起来
-                Page<Generator> page = generatorService.lambdaQuery().orderBy(true, false, Generator::getHot).page(new Page<>(1, 5));
+                // 将hot前8的文章缓存起来
+                Page<Generator> page = generatorService.lambdaQuery().orderBy(true, false, Generator::getHot).page(new Page<>(1, 8));
                 cacheManager.put(RedisConstant.HOT_ARTICLES, page);
             }
         } catch (Exception e) {

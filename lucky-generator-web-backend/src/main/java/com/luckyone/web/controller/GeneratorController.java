@@ -241,7 +241,7 @@ public class GeneratorController {
 
         // 优先从缓存读取
         String cacheKey = CacheConfig.getPageCacheKey(generatorQueryRequest);
-
+//        String cacheKey = RedisConstant.HOT_ARTICLES;
         Object cacheValue = cacheManager.get(cacheKey);
         // 多级缓存
         if (cacheValue != null) {
@@ -288,24 +288,26 @@ public class GeneratorController {
      * @return
      */
     @GetMapping("/list/hot")
-    public BaseResponse<List<Generator>> getHot() {
+    public BaseResponse<Page<GeneratorVO>> getHot(HttpServletRequest request) {
 
         // 优先从缓存中获取
         Object cacheValue =cacheManager.get(RedisConstant.HOT_ARTICLES);
         // 多级缓存
         if (cacheValue != null) {
-            return ResultUtils.success((List<Generator>) cacheValue);
+            Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage((Page<Generator>) cacheValue, request);
+            return ResultUtils.success(generatorVOPage);
         }
 
         // 限制爬虫
-        List<Generator> generatorList = generatorService.lambdaQuery()
+        Page<Generator> page = generatorService.lambdaQuery()
                 .select(Generator::getId, Generator::getDescription, Generator::getTags, Generator::getPicture, Generator::getStatus, Generator::getUserId
                         , Generator::getLikeCount, Generator::getStarCount, Generator::getCommentCount, Generator::getCreateTime, Generator::getUpdateTime)
-                .orderBy(true, false, Generator::getHot).last("limit 5").list();
+                .orderBy(true, false, Generator::getHot).page(new Page<>(1, 8));
 
         // 写入多级缓存
-        cacheManager.put(RedisConstant.HOT_ARTICLES, generatorList);
-        return ResultUtils.success(generatorList);
+        cacheManager.put(RedisConstant.HOT_ARTICLES, page);
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(page, request);
+        return ResultUtils.success(generatorVOPage);
     }
 
     /**
