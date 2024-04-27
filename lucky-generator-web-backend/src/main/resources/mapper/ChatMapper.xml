@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luckyone.web.mapper.ChatMapper">
+
+    <resultMap id="BaseResultMap" type="com.luckyone.web.model.entity.Chat">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userId" column="userId" jdbcType="INTEGER"/>
+            <result property="anotherId" column="anotherId" jdbcType="INTEGER"/>
+            <result property="isDeleted" column="isDeleted" jdbcType="TINYINT"/>
+            <result property="unread" column="unread" jdbcType="INTEGER"/>
+            <result property="latestTime" column="latestTime" jdbcType="TIMESTAMP"/>
+            <result property="lastMessage" column="lastMessage" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,anotherId,
+        isDeleted,unread,latestTime,lastMessage
+    </sql>
+</mapper>
