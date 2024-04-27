@@ -2,7 +2,6 @@ package com.luckyone.web.mapper;
 
 import com.luckyone.web.model.entity.Generator;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;

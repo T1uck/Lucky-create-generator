@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luckyone.web.common.BeanCopyUtils;
 import com.luckyone.web.common.ErrorCode;
+import com.luckyone.web.common.IMResponse;
 import com.luckyone.web.exception.BusinessException;
+import com.luckyone.web.im.IMServer;
 import com.luckyone.web.mapper.GeneratorMapper;
 import com.luckyone.web.model.dto.comment.PostCommentRequest;
 import com.luckyone.web.model.dto.user.UsernameAndAvtarDto;
@@ -17,15 +19,17 @@ import com.luckyone.web.model.dto.comment.RootCommentVo;
 import com.luckyone.web.model.entity.User;
 import com.luckyone.web.service.GeneratorCommentService;
 import com.luckyone.web.mapper.GeneratorCommentMapper;
+import com.luckyone.web.service.MsgUnreadService;
 import com.luckyone.web.service.UserService;
+import com.luckyone.web.utils.RedisKeyUtils;
+import com.luckyone.web.utils.RedisUtil;
+import io.netty.channel.Channel;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -41,7 +45,16 @@ public class GeneratorCommentServiceImpl extends ServiceImpl<GeneratorCommentMap
     private UserService userService;
 
     @Resource
+    private MsgUnreadService msgUnreadService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Override
     public List<RootCommentVo> getRootCommentsOfGenerator(Long id) {
@@ -96,7 +109,7 @@ public class GeneratorCommentServiceImpl extends ServiceImpl<GeneratorCommentMap
 
     @Override
     public void likeComment(Long id) {
-        
+
     }
 
     @Override
@@ -126,8 +139,35 @@ public class GeneratorCommentServiceImpl extends ServiceImpl<GeneratorCommentMap
                     .setSql("commentCount = commentCount + 1").eq(Generator::getId, postCommentRequest.getGeneratorId()));
         }, threadPoolExecutor);
 
+        //todo: pipeline优化
+        CompletableFuture<Void> cacheFuture = CompletableFuture.runAsync(() -> {
+            //4.增加redis中的计数
+            String UserId = String.valueOf(currentUser.getId());
+            stringRedisTemplate.opsForHash().increment(RedisKeyUtils.MAP_KEY_USER_COMMENT_COUNT,UserId,1);
+            // 如果不是回复自己
+            if (!Objects.equals(comment.getToId(), comment.getFromId())){
+                redisUtil.zset("reply_zset:" + comment.getToId(),comment.getId());
+                msgUnreadService.addOneUnread(Math.toIntExact(comment.getToId()), "reply");
 
-        CompletableFuture.allOf(saveFuture, countFuture).join();
+                // netty 通知未读消息
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("type", "接收");
+                Set<Channel> channels = IMServer.userChannel.get(comment.getToId());
+                if (channels != null) {
+                    for (Channel channel : channels) {
+                        channel.writeAndFlush(IMResponse.message("reply", map));
+                    }
+                }
+            }
+        }, threadPoolExecutor);
+
+        CompletableFuture.allOf(saveFuture, countFuture, cacheFuture).join();
+    }
+
+    @Override
+    public Long getUserCommentCount(Long UserId) {
+
+        return null;
     }
 }
 

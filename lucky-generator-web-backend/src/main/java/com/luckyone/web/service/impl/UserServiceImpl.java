@@ -2,7 +2,6 @@ package com.luckyone.web.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -37,9 +36,9 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -105,7 +104,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setUserName(userName);
             user.setAccessKey(accessKey);
             user.setSecretKey(secretKey);
-            user.setUserAvatar("https://image-bed-ichensw.oss-cn-hangzhou.aliyuncs.com/Multiavatar-f5871c303317a4dafbf6.png");
+            user.setUserAvatar("https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png");
+            user.setUserProfile("我有一头小毛驴我从来也不骑");
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
@@ -323,6 +323,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
+
         // 3. 记录用户的登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, userVO);
         return userVO;
@@ -457,7 +458,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setAccessKey(accessKey);
             user.setEmail(emailAccount);
             user.setSecretKey(secretKey);
-            user.setUserAvatar("https://image-bed-ichensw.oss-cn-hangzhou.aliyuncs.com/Multiavatar-f5871c303317a4dafbf6.png");
+            user.setUserAvatar("https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png");
+            user.setUserProfile("我有一头小毛驴我从来也不骑");
 
             // 邮箱注册时设置默认密码为 luckydaima
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + "luckydaima").getBytes());

@@ -8,11 +8,12 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="generatorId" column="generatorId" jdbcType="BIGINT"/>
             <result property="createBy" column="createBy" jdbcType="BIGINT"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,generatorId,createBy,
+        id,generatorId,createBy,status,
         createTime
     </sql>
 </mapper>

@@ -19,6 +19,16 @@ public class Meta {
     private FileConfig fileConfig;
     private ModelConfig modelConfig;
 
+    /**
+     * 用户强制输入开关
+     */
+    private Boolean forcedInteractiveSwitch;
+
+    /**
+     * 版本控制
+     */
+    private Boolean versionControl;
+
     @NoArgsConstructor
     @Data
     public static class FileConfig implements Serializable{

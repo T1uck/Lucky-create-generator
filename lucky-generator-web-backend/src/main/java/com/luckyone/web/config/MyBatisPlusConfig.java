@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * MyBatis Plus 配置
  */
 @Configuration
-@MapperScan("com.luckyone.web.mapper")
+@MapperScan("com.luckyone.web.service.mapper")
 public class MyBatisPlusConfig {
 
     /**

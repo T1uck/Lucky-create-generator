@@ -20,8 +20,8 @@ public class MetaManager {
 
     // 初始化 Meta，在获取到数据后，利用JSONUtil。toBean将字符串转换为对象
     private static Meta initMeta() {
-        String metaJson = ResourceUtil.readUtf8Str("meta.json");
-//        String metaJson = ResourceUtil.readUtf8Str("springboot-init-meta.json");
+//        String metaJson = ResourceUtil.readUtf8Str("meta.json");
+        String metaJson = ResourceUtil.readUtf8Str("springboot-init-plus.json");
         Meta newMeta = JSONUtil.toBean(metaJson, Meta.class);
         // 校验和处理默认值
         MetaValidator.doValidAndFill(newMeta);

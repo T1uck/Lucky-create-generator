@@ -1,9 +1,9 @@
 package com.luckyone.web;
 
+import com.luckyone.web.im.IMServer;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -17,7 +17,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class MainApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(MainApplication.class, args);
+
+        new Thread(() -> {
+            try {
+                new IMServer().start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 }

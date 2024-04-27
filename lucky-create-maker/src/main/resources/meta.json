@@ -8,7 +8,7 @@
     "fileConfig": {
         "inputRootPath": ".source/acm-template-pro",
         "outputRootPath": "generated",
-        "sourceRootPath": "E:/study/lucky-create-generator/lucky-create-generator-demo/acm-template-pro",
+        "sourceRootPath": "E:/study/lucky-generator/lucky-create-generator/lucky-create-generator-demo/acm-template-pro",
         "type": "dir",
         "files": [
         	{

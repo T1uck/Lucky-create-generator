@@ -1,6 +1,8 @@
 package com.luckyone.maker;
 
+import com.luckyone.maker.generator.JarGenerator;
 import com.luckyone.maker.generator.main.GenerateTemplate;
+import com.luckyone.maker.generator.main.MainGenerator;
 import com.luckyone.maker.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 

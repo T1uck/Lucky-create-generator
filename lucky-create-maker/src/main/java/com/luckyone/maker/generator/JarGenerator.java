@@ -33,6 +33,6 @@ public class JarGenerator {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        doGenerator("E:\\study\\lucky-create-generator\\lucky-create-marker\\generated\\acm-template-pro-generator");
+        doGenerator("E:\\study\\lucky-generator\\lucky-create-generator\\lucky-create-generator-demo\\acm-template-pro");
     }
 }

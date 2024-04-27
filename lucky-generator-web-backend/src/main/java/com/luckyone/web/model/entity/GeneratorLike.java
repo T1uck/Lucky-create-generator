@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.luckyone.web.model.enums.LikedStatusEnum;
 import lombok.Data;
 
 /**
@@ -26,10 +28,16 @@ public class GeneratorLike implements Serializable {
      */
     private Long generatorId;
 
+
     /**
      * 创建用户id
      */
     private Long createBy;
+
+    /**
+     * 点赞状态 0为未点赞 1为点赞
+     */
+    private Integer status = 0;
 
     /**
      * 创建时间

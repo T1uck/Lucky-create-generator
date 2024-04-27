@@ -20,11 +20,6 @@ public class GeneratorQueryRequest extends PageRequest implements Serializable {
     private Long id;
 
     /**
-     * id
-     */
-    private Long notId;
-
-    /**
      * 搜索词
      */
     private String searchText;

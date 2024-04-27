@@ -18,7 +18,6 @@ import com.luckyone.web.service.GeneratorService;
 import com.luckyone.web.service.UserService;
 import com.luckyone.web.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,6 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             return queryWrapper;
         }
         Long id = generatorQueryRequest.getId();
-        Long notId = generatorQueryRequest.getNotId();
         String searchText = generatorQueryRequest.getSearchText();
         List<String> tags = generatorQueryRequest.getTags();
         Long userId = generatorQueryRequest.getUserId();
@@ -97,7 +95,6 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
                 queryWrapper.like("tags", "\"" + tag + "\"");
             }
         }
-        queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
         queryWrapper.eq(ObjectUtils.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq(StringUtils.isNotBlank(basePackage), "basePackage", basePackage);

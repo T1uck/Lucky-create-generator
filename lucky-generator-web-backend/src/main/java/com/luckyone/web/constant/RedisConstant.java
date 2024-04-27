@@ -68,19 +68,21 @@ public interface RedisConstant {
     //系统通知
     public static final String NOTICE_NOTIFICATION_SUFFIX = ":notice";
 
-
     public static final String ARTICLE_PUBLISHED = "generator:published";
 
+
+    /**
+     * 同步锁
+     */
     public static final String ASYNC_CLEAR_LOCK = "generator:lock:clear";
 
+    // 同步点赞
+    public static final String ASYNC_LIKE_LOCK = "generator:lock:like";
 
-    /**
-     * 同步浏览量的锁
-     */
+    // 同步浏览量
     public static final String ASYNC_COUNT_LOCK = "generator:lock:count";
-    /**
-     * 更新文章score和hot的锁
-     */
+
+    // 更新文章score和hot的锁
     public static final String ASYNC_SCORE_LOCK = "generator:lock:score";
 
     /**

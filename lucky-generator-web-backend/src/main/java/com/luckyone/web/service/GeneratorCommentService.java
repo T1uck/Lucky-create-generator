@@ -19,4 +19,6 @@ public interface GeneratorCommentService extends IService<GeneratorComment> {
     void likeComment(Long id);
 
     void publishComment(PostCommentRequest postCommentRequest, HttpServletRequest request);
+
+    Long getUserCommentCount(Long UserId);
 }
